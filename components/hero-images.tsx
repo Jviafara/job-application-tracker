@@ -44,6 +44,7 @@ const HeroImages = () => {
                 width={1200}
                 height={800}
                 className='mx-auto rounded-lg shadow-lg'
+                priority
               />
             )}
             {activeTab === 'get-hired' && (
