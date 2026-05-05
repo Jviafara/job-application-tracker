@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-const MONGODB_URI = process.env.MONGODB_URI
+import dns from 'node:dns/promises'
 
 interface MongooseCache {
   conn: typeof import('mongoose') | null
@@ -15,6 +15,9 @@ const cached: MongooseCache = global.mongoose || { conn: null, promise: null }
 if (!global.mongoose) {
   global.mongoose = cached
 }
+
+const MONGODB_URI = process.env.MONGODB_URI
+dns.setServers(['1.1.1.1', '8.8.8.8'])
 
 async function connectDB() {
   if (!MONGODB_URI) {
