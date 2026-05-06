@@ -4,6 +4,7 @@ import { mongodbAdapter } from 'better-auth/adapters/mongodb'
 import { MongoClient } from 'mongodb'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { initUserBoard } from '../init-user-board'
 
 dns.setServers(['1.1.1.1', '8.8.8.8'])
 
@@ -15,8 +16,17 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  secret: process.env.BETTER_AUTH_SECRET!,
-  baseURL: process.env.BETTER_AUTH_URL!,
+  databaseHooks: {
+    user: {
+      create: {
+        after: async user => {
+          if (user.id) {
+            await initUserBoard(user.id)
+          }
+        },
+      },
+    },
+  },
 })
 
 export const getSession = async () => {
