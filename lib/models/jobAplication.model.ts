@@ -12,7 +12,6 @@ export interface IJobAplication extends Document {
   notes?: string
   salary?: string
   jobUrl?: string
-  appliedDate: Date
   tags?: string[]
   description?: string
   createdAt: Date
@@ -62,10 +61,6 @@ const jobApplicationSchema = new Schema<IJobAplication>(
     notes: { type: String },
     salary: { type: String },
     jobUrl: { type: String },
-    appliedDate: {
-      type: Date,
-      required: true,
-    },
     tags: [{ type: String }],
     description: { type: String },
   },

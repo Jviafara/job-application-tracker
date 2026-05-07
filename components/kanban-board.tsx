@@ -1,12 +1,13 @@
 'use client'
 
-import { Board, Column } from '@/lib/models/models.types'
+import { Board, Column, JobApplication } from '@/lib/models/models.types'
 import { Award, Calendar, CheckCircle2, Mic, MoreVertical, Trash2, XCircle } from 'lucide-react'
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { Button } from './ui/button'
 import CreateJobApplication from './create-job-application'
+import JobApplicationCard from './job-aplication-card'
 
 interface KanbanBoardProps {
   board: Board
@@ -41,7 +42,19 @@ const COLUMN_CONFIG: Array<ColConfig> = [
   },
 ]
 
-function DroppableCollumn({ column, config, boardId }: { column: Column; config: ColConfig; boardId: string }) {
+function DroppableCollumn({
+  column,
+  config,
+  boardId,
+  sortedColumns,
+}: {
+  column: Column
+  config: ColConfig
+  boardId: string
+  sortedColumns: Column[]
+}) {
+  const sortedJobs = column.jobApplications?.sort((a, b) => a.order - b.order) || []
+
   return (
     <Card className='min-w-75 shrink-0 shadow-md p-0'>
       <CardHeader className={`${config.color} text-white rounded-t-lg pb-3 pt-3`}>
@@ -65,6 +78,13 @@ function DroppableCollumn({ column, config, boardId }: { column: Column; config:
         </div>
       </CardHeader>
       <CardContent className='space-y-2 bg-gray-50 min-h-100 rounded-b-lg'>
+        {sortedJobs.map((job, key) => (
+          <SortableJobCard
+            key={key}
+            job={{ ...job, columnId: job.columnId || column._id }}
+            columns={sortedColumns}
+          />
+        ))}
         <CreateJobApplication
           columnId={column._id}
           boardId={boardId}
@@ -74,8 +94,20 @@ function DroppableCollumn({ column, config, boardId }: { column: Column; config:
   )
 }
 
+const SortableJobCard = ({ job, columns }: { job: JobApplication; columns: Column[] }) => {
+  return (
+    <div>
+      <JobApplicationCard
+        job={job}
+        columns={columns}
+      />
+    </div>
+  )
+}
+
 const KanbanBoard = ({ board, userId }: KanbanBoardProps) => {
   const columns = board.columns
+  const sortedColumns = columns?.sort((a, b) => a.order - b.order)
 
   return (
     <>
@@ -92,6 +124,7 @@ const KanbanBoard = ({ board, userId }: KanbanBoardProps) => {
                 column={col}
                 config={config}
                 boardId={board._id}
+                sortedColumns={sortedColumns}
               />
             )
           })}

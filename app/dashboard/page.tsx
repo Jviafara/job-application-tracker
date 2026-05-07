@@ -13,7 +13,12 @@ const Dashboard = async () => {
 
   await connectDB()
 
-  const res = await Board.findOne({ userId: session.user.id, name: 'Job Hunt' }).populate({ path: 'columns' })
+  const res = await Board.findOne({ userId: session.user.id, name: 'Job Hunt' }).populate({
+    path: 'columns',
+    populate: {
+      path: 'jobApplications',
+    },
+  })
   const board = JSON.parse(JSON.stringify(res))
 
   return (
