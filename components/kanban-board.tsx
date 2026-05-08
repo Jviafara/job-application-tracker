@@ -5,7 +5,6 @@ import { Award, Calendar, CheckCircle2, Mic, MoreVertical, Trash2, XCircle } fro
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
-import { Button } from './ui/button'
 import CreateJobApplication from './create-job-application'
 import JobApplicationCard from './job-aplication-card'
 

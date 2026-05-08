@@ -3,23 +3,31 @@ import { getSession } from '@/lib/auth/auth'
 import { Board } from '@/lib/models'
 import connectDB from '@/lib/mongodb'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 
-const Dashboard = async () => {
+const getBoard = async (userId: string) => {
+  'use cache'
+  await connectDB()
+  const res = await Board.findOne({ userId, name: 'Job Hunt' }).populate({
+    path: 'columns',
+    populate: {
+      path: 'jobApplications',
+    },
+  })
+
+  if (!res) return null
+
+  return JSON.parse(JSON.stringify(res))
+}
+
+const DashboardpageWrapper = async () => {
   const session = await getSession()
 
   if (!session?.user) {
     redirect('/sign-in')
   }
 
-  await connectDB()
-
-  const res = await Board.findOne({ userId: session.user.id, name: 'Job Hunt' }).populate({
-    path: 'columns',
-    populate: {
-      path: 'jobApplications',
-    },
-  })
-  const board = JSON.parse(JSON.stringify(res))
+  const board = await getBoard(session.user.id ?? '')
 
   return (
     <div className='min-h-screen bg-white'>
@@ -34,6 +42,14 @@ const Dashboard = async () => {
         userId={session.user.id}
       />
     </div>
+  )
+}
+
+const Dashboard = async () => {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <DashboardpageWrapper />
+    </Suspense>
   )
 }
 
