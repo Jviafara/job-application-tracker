@@ -2,7 +2,7 @@ import connectDB from '../lib/mongodb'
 import '@/lib/models'
 import { Board, Column, JobApplication } from '@/lib/models'
 
-const USER_ID = '69fb09bbd6ece04e722031bf'
+const USER_ID = '69ff262bf257a0f589e88ea5'
 
 const SAMPLE_JOBS = [
   // Wish List

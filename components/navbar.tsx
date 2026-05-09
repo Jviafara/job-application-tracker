@@ -7,14 +7,18 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Avatar, AvatarFallback } from './ui/avatar'
 import SignOutButton from './sign-out-button'
 import { useSession } from '@/lib/auth/auth-client'
+import CreateColumnButton from './create-column-button'
+import { useState } from 'react'
 
 const Navbar = () => {
+  const [modalOpen, setModalOpen] = useState(false)
   const { data: session } = useSession()
   return (
     <nav className='border-b border-gray-200 bg-white'>
@@ -58,6 +62,8 @@ const Navbar = () => {
                       </div>
                     </DropdownMenuLabel>
                   </DropdownMenuGroup>
+                  <DropdownMenuItem onClick={() => setModalOpen(true)}>Add Column</DropdownMenuItem>
+
                   <SignOutButton />
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -84,6 +90,11 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      <CreateColumnButton
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+      />
     </nav>
   )
 }

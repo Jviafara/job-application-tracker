@@ -37,10 +37,7 @@ const DashboardpageWrapper = async () => {
           <p className='text-gray-600'>Track your job applications.</p>
         </div>
       </div>
-      <KanbanBoard
-        board={board}
-        userId={session.user.id}
-      />
+      <KanbanBoard board={board} />
     </div>
   )
 }
