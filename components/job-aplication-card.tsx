@@ -1,19 +1,54 @@
+'use client'
+
 import { Column, JobApplication } from '@/lib/models/models.types'
 import { Card, CardContent } from './ui/card'
 import { Edit2, ExternalLink, MoreVertical, Trash2 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { buttonVariants } from './ui/button'
 import { cn } from '@/lib/utils'
+import { deleteJob, updateJobApplication } from '@/lib/actions/job-applications-actions'
+import UpdateJobApplication from './update-job-application'
+import React, { useState } from 'react'
 
 interface JobApplicationCardsProps {
   job: JobApplication
   columns: Column[]
+  dragHandleProps?: React.HTMLAttributes<HTMLElement>
 }
 
-const JobApplicationCard = ({ job, columns }: JobApplicationCardsProps) => {
+const JobApplicationCard = ({ job, columns, dragHandleProps }: JobApplicationCardsProps) => {
+  const [editing, setEditing] = useState(false)
+
+  // Modify dragHandleProps to suppress hydration warning for aria-describedby
+  const modifiedDragHandleProps = dragHandleProps
+    ? {
+        ...dragHandleProps,
+        suppressHydrationWarning: true,
+      }
+    : undefined
+
+  const handleMove = async (newColumnId: string) => {
+    try {
+      await updateJobApplication(job._id, { columnId: newColumnId })
+    } catch (err) {
+      console.error('Failed to move job application!', err)
+    }
+  }
+
+  const handleDelete = async () => {
+    await deleteJob(job._id)
+    try {
+    } catch (err) {
+      console.error('Failed to delete the job application!!!', err)
+    }
+  }
+
   return (
     <>
-      <Card className='cursor-pointer transition-shadow hover:shadow-lg bg-white group shadow-sm'>
+      <Card
+        className='cursor-pointer transition-shadow hover:shadow-lg bg-white group shadow-sm'
+        {...modifiedDragHandleProps}
+      >
         <CardContent className='p-4'>
           <div className='flex items-start justify-between gap-2'>
             <div className='flex-1 min-w-0'>
@@ -58,7 +93,7 @@ const JobApplicationCard = ({ job, columns }: JobApplicationCardsProps) => {
                   <MoreVertical />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setEditing(true)}>
                     <Edit2 className=' mr-2 h-4 w-4' />
                     Edit
                   </DropdownMenuItem>
@@ -67,12 +102,20 @@ const JobApplicationCard = ({ job, columns }: JobApplicationCardsProps) => {
                       {columns
                         .filter(c => c._id !== job.columnId)
                         .map((col, key) => (
-                          <DropdownMenuItem key={key}>Move to {col.name}</DropdownMenuItem>
+                          <DropdownMenuItem
+                            key={key}
+                            onClick={() => handleMove(col._id)}
+                          >
+                            Move to {col.name}
+                          </DropdownMenuItem>
                         ))}
                     </>
                   )}
 
-                  <DropdownMenuItem className=' text-destructive'>
+                  <DropdownMenuItem
+                    className=' text-destructive'
+                    onClick={() => handleDelete()}
+                  >
                     <Trash2 className=' mr-2 h-4 w-4' />
                     Delete
                   </DropdownMenuItem>
@@ -82,6 +125,12 @@ const JobApplicationCard = ({ job, columns }: JobApplicationCardsProps) => {
           </div>
         </CardContent>
       </Card>
+
+      <UpdateJobApplication
+        job={job}
+        editing={editing}
+        setEditing={setEditing}
+      />
     </>
   )
 }
